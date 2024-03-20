@@ -1,1 +1,72 @@
+import queue
+
+def sumar_colas(cola_a, cola_b):
+    if cola_a.qsize() != cola_b.qsize():
+        raise ValueError("Las colas deben tener la misma cantidad de elementos")
+
+    cola_resultado = queue.Queue()
+    while not cola_a.empty():
+        elemento_a = cola_a.get()
+        elemento_b = cola_b.get()
+        suma = elemento_a + elemento_b
+        cola_resultado.put(suma)
+    
+    return cola_resultado
+
+class ManejadorColas:
+    def __init__(self):
+        self.colas_servicios = {}
+    
+    def agregar_cola_servicio(self, nombre_servicio):
+        self.colas_servicios[nombre_servicio] = queue.Queue()
+    
+    def agregar_cliente(self, nombre_servicio, numero_cliente):
+        if nombre_servicio not in self.colas_servicios:
+            raise ValueError("El servicio ingresado no existe")
+        
+        self.colas_servicios[nombre_servicio].put(numero_cliente)
+    
+    def atender_cliente(self, nombre_servicio):
+        if nombre_servicio not in self.colas_servicios:
+            raise ValueError("El servicio ingresado no existe")
+        
+        if self.colas_servicios[nombre_servicio].empty():
+            print("No hay clientes en espera para este servicio")
+        else:
+            cliente_atendido = self.colas_servicios[nombre_servicio].get()
+            print(f"Se está atendiendo al cliente número {cliente_atendido} del servicio {nombre_servicio}")
+
+if __name__ == "__main__":
+    cola_a = queue.Queue()
+    cola_b = queue.Queue()
+
+    for num in [3, 4, 2, 8, 12]:
+        cola_a.put(num)
+
+    for num in [6, 2, 9, 11, 3]:
+        cola_b.put(num)
+
+    cola_resultado = sumar_colas(cola_a, cola_b)
+    print("Cola Resultado:")
+    while not cola_resultado.empty():
+        print(cola_resultado.get())
+
+    manejador_colas = ManejadorColas()
+
+    while True:
+        opcion = input("Ingrese 'R' para registrar un servicio, 'C' para agregar un cliente o 'A' para atender un cliente: ").strip().upper()
+
+        if opcion == "R":
+            nombre_servicio = input("Ingrese el nombre del servicio a registrar: ").strip()
+            manejador_colas.agregar_cola_servicio(nombre_servicio)
+            print(f"Servicio '{nombre_servicio}' registrado correctamente.")
+        elif opcion == "C":
+            servicio = input("Ingrese el nombre del servicio: ").strip()
+            numero_cliente = int(input("Ingrese el número del cliente: "))
+            manejador_colas.agregar_cliente(servicio, numero_cliente)
+        elif opcion == "A":
+            servicio = input("Ingrese el nombre del servicio: ").strip()
+            manejador_colas.atender_cliente(servicio)
+        else:
+            print("Opción no válida. Por favor, ingrese 'R', 'C' o 'A'.")
 
